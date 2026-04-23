@@ -1,0 +1,24 @@
+name: Deploy to production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, twilight]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        run: |
+          rsync -av --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            $GITHUB_WORKSPACE/ /var/www/asteisesdev.ru/
+
+      - name: Verify
+        run: curl -sf https://asteisesdev.ru > /dev/null && echo "OK" || echo "FAIL"
